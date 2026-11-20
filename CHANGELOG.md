@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-20
+
 ### Added
 
 - First version of the Huawei LTE integration, from the official Gladys
@@ -23,4 +25,5 @@ All notable changes to this integration are documented here. The format follows
   countries, keywords and categories.
 - CI, release, image build and GitHub Release workflows.
 
-[Unreleased]: https://github.com/prohand/gladys-huawailte/commits/main
+[Unreleased]: https://github.com/prohand/gladys-huawailte/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/prohand/gladys-huawailte/releases/tag/v1.0.1
