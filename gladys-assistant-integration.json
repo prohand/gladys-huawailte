@@ -1,0 +1,603 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Huawei LTE",
+  "description": {
+    "en": "Signal, data usage and SMS of a Huawei 4G/5G router, with scenes and a dashboard widget.",
+    "fr": "Signal, conso data et SMS d'un routeur Huawei 4G/5G, avec scènes et widget.",
+    "de": "Signal, Datenverbrauch und SMS eines Huawei-4G/5G-Routers, mit Szenen und Widget.",
+    "es": "Señal, consumo de datos y SMS de un router Huawei 4G/5G, con escenas y widget."
+  },
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/prohand/gladys-huawailte:1.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-huawailte/main/cover.png",
+  "categories": ["network", "notifications"],
+  "keywords": ["huawei", "hilink", "lte", "4g", "5g", "sms", "b525", "b535", "b818", "e5576"],
+  "countries": [
+    "FR",
+    "BE",
+    "CH",
+    "LU",
+    "MC",
+    "DE",
+    "AT",
+    "ES",
+    "PT",
+    "IT",
+    "NL",
+    "GB",
+    "IE",
+    "PL",
+    "MA",
+    "TN",
+    "SN",
+    "CI",
+    "MX",
+    "CO"
+  ],
+  "transports": ["local"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "The integration talks to your Huawei router on your local network, like its web page does: give it the router address and the password of its web page (the one you use on http://192.168.8.1). Nothing goes through the internet or a Huawei account.",
+        "fr": "L'intégration parle à votre routeur Huawei sur votre réseau local, comme sa page web : donnez-lui l'adresse du routeur et le mot de passe de sa page web (celui que vous utilisez sur http://192.168.8.1). Rien ne passe par internet ni par un compte Huawei.",
+        "de": "Die Integration spricht mit deinem Huawei-Router im lokalen Netzwerk, wie seine Weboberfläche: Gib die Adresse des Routers und das Passwort seiner Weboberfläche an (das du auf http://192.168.8.1 benutzt). Nichts läuft über das Internet oder ein Huawei-Konto.",
+        "es": "La integración habla con su router Huawei en su red local, como su página web: indique la dirección del router y la contraseña de su página web (la que usa en http://192.168.8.1). Nada pasa por internet ni por una cuenta de Huawei."
+      },
+      "links": [
+        {
+          "url": "https://github.com/prohand/gladys-huawailte#readme",
+          "label": {
+            "en": "Documentation",
+            "fr": "Documentation",
+            "de": "Dokumentation",
+            "es": "Documentación"
+          }
+        }
+      ]
+    },
+    {
+      "key": "router_url",
+      "type": "string",
+      "label": {
+        "en": "Router address",
+        "fr": "Adresse du routeur",
+        "de": "Router-Adresse",
+        "es": "Dirección del router"
+      },
+      "description": {
+        "en": "Address of the router web page, usually http://192.168.8.1.",
+        "fr": "Adresse de la page web du routeur, en général http://192.168.8.1.",
+        "de": "Adresse der Weboberfläche des Routers, meist http://192.168.8.1.",
+        "es": "Dirección de la página web del router, normalmente http://192.168.8.1."
+      },
+      "placeholder": {
+        "en": "e.g. http://192.168.8.1",
+        "fr": "ex. http://192.168.8.1",
+        "de": "z. B. http://192.168.8.1",
+        "es": "p. ej. http://192.168.8.1"
+      },
+      "required": true,
+      "default": "http://192.168.8.1"
+    },
+    {
+      "key": "username",
+      "type": "string",
+      "label": {
+        "en": "Username",
+        "fr": "Nom d'utilisateur",
+        "de": "Benutzername",
+        "es": "Nombre de usuario"
+      },
+      "description": {
+        "en": "User of the router web page, almost always admin.",
+        "fr": "Utilisateur de la page web du routeur, presque toujours admin.",
+        "de": "Benutzer der Weboberfläche des Routers, fast immer admin.",
+        "es": "Usuario de la página web del router, casi siempre admin."
+      },
+      "required": false,
+      "default": "admin"
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "description": {
+        "en": "Password of the router web page. Leave empty for a HiLink USB stick without login.",
+        "fr": "Mot de passe de la page web du routeur. Laissez vide pour une clé USB HiLink sans connexion.",
+        "de": "Passwort der Weboberfläche des Routers. Leer lassen bei einem HiLink-USB-Stick ohne Anmeldung.",
+        "es": "Contraseña de la página web del router. Déjela vacía para un módem USB HiLink sin inicio de sesión."
+      },
+      "required": false
+    },
+    {
+      "key": "refresh_interval",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "How often the router is read, in seconds (15 to 3600). New SMS are seen at the same pace.",
+        "fr": "Fréquence de lecture du routeur, en secondes (15 à 3600). Les nouveaux SMS sont vus au même rythme.",
+        "de": "Wie oft der Router ausgelesen wird, in Sekunden (15 bis 3600). Neue SMS werden im selben Takt erkannt.",
+        "es": "Cada cuánto se lee el router, en segundos (15 a 3600). Los SMS nuevos se detectan al mismo ritmo."
+      },
+      "required": false,
+      "default": 60,
+      "min": 15,
+      "max": 3600
+    },
+    {
+      "key": "sms_watch",
+      "type": "boolean",
+      "label": {
+        "en": "Watch incoming SMS",
+        "fr": "Surveiller les SMS reçus",
+        "de": "Eingehende SMS überwachen",
+        "es": "Vigilar los SMS recibidos"
+      },
+      "description": {
+        "en": "Fire the \"SMS received\" scene trigger for each new message.",
+        "fr": "Déclenche « SMS reçu » dans les scènes pour chaque nouveau message.",
+        "de": "Löst in Szenen „SMS empfangen“ für jede neue Nachricht aus.",
+        "es": "Activa «SMS recibido» en las escenas para cada mensaje nuevo."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "sms_mark_read",
+      "type": "boolean",
+      "label": {
+        "en": "Mark handled SMS as read",
+        "fr": "Marquer les SMS traités comme lus",
+        "de": "Verarbeitete SMS als gelesen markieren",
+        "es": "Marcar como leídos los SMS tratados"
+      },
+      "description": {
+        "en": "Once the trigger fired, the message is marked read on the router.",
+        "fr": "Une fois le déclencheur lancé, le message est marqué lu sur le routeur.",
+        "de": "Nach dem Auslösen wird die Nachricht auf dem Router als gelesen markiert.",
+        "es": "Una vez activado el disparador, el mensaje se marca como leído en el router."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "dashboard_controls",
+      "type": "boolean",
+      "label": {
+        "en": "Control buttons on the dashboard",
+        "fr": "Boutons de contrôle sur le tableau de bord",
+        "de": "Steuertasten im Dashboard",
+        "es": "Botones de control en el panel"
+      },
+      "description": {
+        "en": "Show \"Send an SMS\", \"Mobile data\" and \"Reboot\" on the widget. Anyone who sees the dashboard can use them.",
+        "fr": "Affiche « Envoyer un SMS », « Data mobile » et « Redémarrer » sur le widget. Toute personne qui voit le tableau de bord peut s'en servir.",
+        "de": "Zeigt „SMS senden“, „Mobile Daten“ und „Neustart“ im Widget. Jeder, der das Dashboard sieht, kann sie benutzen.",
+        "es": "Muestra «Enviar un SMS», «Datos móviles» y «Reiniciar» en el widget. Cualquiera que vea el panel puede usarlos."
+      },
+      "required": false,
+      "default": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Reads the router now and shows what it answered.",
+        "fr": "Lit le routeur maintenant et affiche sa réponse.",
+        "de": "Liest den Router jetzt aus und zeigt seine Antwort.",
+        "es": "Lee el router ahora y muestra su respuesta."
+      },
+      "timeout_seconds": 60
+    },
+    {
+      "key": "send_test_sms",
+      "label": {
+        "en": "Send a test SMS",
+        "fr": "Envoyer un SMS de test",
+        "de": "Test-SMS senden",
+        "es": "Enviar un SMS de prueba"
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "phone",
+          "type": "string",
+          "label": {
+            "en": "Phone number",
+            "fr": "Numéro de téléphone",
+            "de": "Telefonnummer",
+            "es": "Número de teléfono"
+          },
+          "placeholder": {
+            "en": "e.g. +33612345678",
+            "fr": "ex. +33612345678",
+            "de": "z. B. +4915112345678",
+            "es": "p. ej. +34612345678"
+          },
+          "required": true
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "reboot_router",
+      "label": {
+        "en": "Reboot the router",
+        "fr": "Redémarrer le routeur",
+        "de": "Router neu starten",
+        "es": "Reiniciar el router"
+      },
+      "description": {
+        "en": "Internet is cut for one to three minutes.",
+        "fr": "Internet est coupé une à trois minutes.",
+        "de": "Das Internet ist ein bis drei Minuten unterbrochen.",
+        "es": "Internet se corta de uno a tres minutos."
+      },
+      "timeout_seconds": 30
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "sms_received",
+      "label": {
+        "en": "An SMS is received",
+        "fr": "Un SMS est reçu",
+        "de": "Eine SMS wird empfangen",
+        "es": "Se recibe un SMS"
+      },
+      "description": {
+        "en": "A new message arrived in the router inbox.",
+        "fr": "Un nouveau message est arrivé dans la boîte du routeur.",
+        "de": "Eine neue Nachricht ist im Posteingang des Routers angekommen.",
+        "es": "Ha llegado un mensaje nuevo a la bandeja del router."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Router",
+            "fr": "Routeur",
+            "de": "Router",
+            "es": "Router"
+          },
+          "required": false
+        },
+        {
+          "key": "sender",
+          "type": "string",
+          "label": {
+            "en": "Only from this number",
+            "fr": "Seulement de ce numéro",
+            "de": "Nur von dieser Nummer",
+            "es": "Solo de este número"
+          },
+          "description": {
+            "en": "Exactly as the router shows it (e.g. +33612345678). Empty: any sender.",
+            "fr": "Exactement comme le routeur l'affiche (ex. +33612345678). Vide : tout expéditeur.",
+            "de": "Genau wie der Router sie anzeigt (z. B. +4915112345678). Leer: jeder Absender.",
+            "es": "Exactamente como lo muestra el router (p. ej. +34612345678). Vacío: cualquier remitente."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "sender",
+          "type": "string",
+          "label": {
+            "en": "Sender",
+            "fr": "Expéditeur",
+            "de": "Absender",
+            "es": "Remitente"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          }
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Date",
+            "fr": "Date",
+            "de": "Datum",
+            "es": "Fecha"
+          }
+        }
+      ]
+    },
+    {
+      "key": "connection_changed",
+      "label": {
+        "en": "The internet connection changes",
+        "fr": "La connexion internet change",
+        "de": "Die Internetverbindung ändert sich",
+        "es": "La conexión a internet cambia"
+      },
+      "description": {
+        "en": "The router connects, loses the mobile network, or stops answering.",
+        "fr": "Le routeur se connecte, perd le réseau mobile ou ne répond plus.",
+        "de": "Der Router verbindet sich, verliert das Mobilfunknetz oder antwortet nicht mehr.",
+        "es": "El router se conecta, pierde la red móvil o deja de responder."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Router",
+            "fr": "Routeur",
+            "de": "Router",
+            "es": "Router"
+          },
+          "required": false
+        },
+        {
+          "key": "state",
+          "type": "multi_select",
+          "label": {
+            "en": "New state",
+            "fr": "Nouvel état",
+            "de": "Neuer Zustand",
+            "es": "Nuevo estado"
+          },
+          "options": [
+            {
+              "value": "connected",
+              "label": {
+                "en": "Connected",
+                "fr": "Connecté",
+                "de": "Verbunden",
+                "es": "Conectado"
+              }
+            },
+            {
+              "value": "disconnected",
+              "label": {
+                "en": "Disconnected",
+                "fr": "Déconnecté",
+                "de": "Getrennt",
+                "es": "Desconectado"
+              }
+            },
+            {
+              "value": "unreachable",
+              "label": {
+                "en": "Router unreachable",
+                "fr": "Routeur injoignable",
+                "de": "Router nicht erreichbar",
+                "es": "Router inaccesible"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "state",
+          "type": "string",
+          "label": {
+            "en": "New state",
+            "fr": "Nouvel état",
+            "de": "Neuer Zustand",
+            "es": "Nuevo estado"
+          }
+        },
+        {
+          "key": "previous_state",
+          "type": "string",
+          "label": {
+            "en": "Previous state",
+            "fr": "État précédent",
+            "de": "Vorheriger Zustand",
+            "es": "Estado anterior"
+          }
+        },
+        {
+          "key": "network_type",
+          "type": "string",
+          "label": {
+            "en": "Network type",
+            "fr": "Type de réseau",
+            "de": "Netztyp",
+            "es": "Tipo de red"
+          }
+        },
+        {
+          "key": "operator",
+          "type": "string",
+          "label": {
+            "en": "Operator",
+            "fr": "Opérateur",
+            "de": "Anbieter",
+            "es": "Operador"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "send_sms",
+      "label": {
+        "en": "Send an SMS",
+        "fr": "Envoyer un SMS",
+        "de": "SMS senden",
+        "es": "Enviar un SMS"
+      },
+      "description": {
+        "en": "Sends a text message through the router SIM card.",
+        "fr": "Envoie un SMS avec la carte SIM du routeur.",
+        "de": "Sendet eine SMS über die SIM-Karte des Routers.",
+        "es": "Envía un SMS con la tarjeta SIM del router."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "phone",
+          "type": "string",
+          "label": {
+            "en": "Phone number(s)",
+            "fr": "Numéro(s) de téléphone",
+            "de": "Telefonnummer(n)",
+            "es": "Número(s) de teléfono"
+          },
+          "description": {
+            "en": "Up to 5 numbers, separated by commas.",
+            "fr": "Jusqu'à 5 numéros, séparés par des virgules.",
+            "de": "Bis zu 5 Nummern, durch Kommas getrennt.",
+            "es": "Hasta 5 números, separados por comas."
+          },
+          "placeholder": {
+            "en": "e.g. +33612345678",
+            "fr": "ex. +33612345678",
+            "de": "z. B. +4915112345678",
+            "es": "p. ej. +34612345678"
+          },
+          "required": true
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "sent",
+          "type": "boolean",
+          "label": {
+            "en": "SMS sent",
+            "fr": "SMS envoyé",
+            "de": "SMS gesendet",
+            "es": "SMS enviado"
+          }
+        },
+        {
+          "key": "recipients",
+          "type": "number",
+          "label": {
+            "en": "Recipients",
+            "fr": "Destinataires",
+            "de": "Empfänger",
+            "es": "Destinatarios"
+          }
+        }
+      ]
+    },
+    {
+      "key": "reboot_router",
+      "label": {
+        "en": "Reboot the router",
+        "fr": "Redémarrer le routeur",
+        "de": "Router neu starten",
+        "es": "Reiniciar el router"
+      },
+      "description": {
+        "en": "Internet is cut for one to three minutes.",
+        "fr": "Internet est coupé une à trois minutes.",
+        "de": "Das Internet ist ein bis drei Minuten unterbrochen.",
+        "es": "Internet se corta de uno a tres minutos."
+      },
+      "timeout_seconds": 30,
+      "outputs": [
+        {
+          "key": "rebooted",
+          "type": "boolean",
+          "label": {
+            "en": "Reboot requested",
+            "fr": "Redémarrage demandé",
+            "de": "Neustart angefordert",
+            "es": "Reinicio solicitado"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "lte_router",
+      "label": {
+        "en": "Huawei LTE router",
+        "fr": "Routeur Huawei LTE",
+        "de": "Huawei-LTE-Router",
+        "es": "Router Huawei LTE"
+      },
+      "description": {
+        "en": "Signal, data rates, data used this month, operator and unread SMS.",
+        "fr": "Signal, débits, data consommée ce mois-ci, opérateur et SMS non lus.",
+        "de": "Signal, Datenraten, Datenverbrauch des Monats, Anbieter und ungelesene SMS.",
+        "es": "Señal, velocidades, datos usados este mes, operador y SMS sin leer."
+      },
+      "icon": "radio",
+      "settings": [
+        {
+          "key": "show_wan_ip",
+          "type": "boolean",
+          "label": {
+            "en": "Show the WAN IP address",
+            "fr": "Afficher l'adresse IP WAN",
+            "de": "WAN-IP-Adresse anzeigen",
+            "es": "Mostrar la dirección IP WAN"
+          },
+          "required": false,
+          "default": false
+        }
+      ],
+      "action_timeout_seconds": 30
+    }
+  ]
+}
